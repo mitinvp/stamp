@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Звіт ЛР/ПР зі штампом</title>
+<style>
+:root{--bg:#fff;--fg:#1c1c1c;--mut:#666;--card:#f5f5f3;--bd:#d0d0c8;--ac:#1f5fbf;--acf:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171717;--fg:#eee;--mut:#9a9a9a;--card:#222;--bd:#3a3a3a;--ac:#6aa3f5;--acf:#0b1b33}}
+:root[data-theme="dark"]{--bg:#171717;--fg:#eee;--mut:#9a9a9a;--card:#222;--bd:#3a3a3a;--ac:#6aa3f5;--acf:#0b1b33}
+html{color-scheme:light dark}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:16px}
+h1{font-size:1.3rem;margin:.2em 0 .1em}
+p.s{color:var(--mut);margin:0 0 1em;font-size:.92rem}
+h2{font-size:1rem;margin:1.4em 0 .4em}
+label{display:block;font-size:.85rem;color:var(--mut);margin:.6em 0 .2em}
+input,select,textarea{width:100%;box-sizing:border-box;padding:9px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--fg);font:inherit}
+textarea{min-height:70px;resize:vertical}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.g>div.f{grid-column:1/-1}
+.it{border:1px solid var(--bd);border-radius:10px;padding:10px;margin:8px 0;background:var(--card)}
+.it textarea,.it input[type=text]{background:var(--bg)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
+button{font:inherit;padding:9px 14px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--fg);cursor:pointer}
+button.p{background:var(--ac);color:var(--acf);border-color:var(--ac);font-weight:600;width:100%;padding:13px;margin-top:20px}
+.th{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.th span{position:relative}
+.th img{height:56px;border-radius:4px;border:1px solid var(--bd)}
+.th b{position:absolute;top:-6px;right:-6px;background:#c33;color:#fff;border-radius:50%;width:18px;height:18px;text-align:center;font-size:12px;line-height:18px;cursor:pointer}
+#st{margin-top:10px;font-size:.9rem;min-height:1.2em}
+.bk{border:1px dashed var(--bd);border-radius:8px;padding:8px;margin:8px 0;background:var(--bg)}
+.bk small{color:var(--mut);display:block;margin-bottom:4px}
+.bk .ctl{display:flex;gap:4px;justify-content:flex-end;margin-bottom:4px}
+.bk .ctl button{padding:2px 9px}
+.bk textarea.m{font-family:ui-monospace,Menlo,Consolas,monospace}
+.add{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.add button{padding:6px 10px;font-size:.9rem}
+</style>
+</head>
+<body>
+<main>
+<h1>Звіт ЛР/ПР зі штампом</h1>
+<p class="s">Заповніть поля та завантажте готовий .docx: рамка, штампи й нумерація сторінок створюються автоматично.</p>
+
+<h2>Штамп</h2>
+<div class="g">
+<div><label>Тип роботи</label><select id="kind"><option>ПР</option><option>ЛР</option></select></div>
+<div><label>Номер (напр. 21.04)</label><input id="num"></div>
+<div><label>Група</label><input id="group" placeholder="КІ 23"></div>
+<div><label>Розробив (Прізвище І.П.)</label><input id="student"></div>
+<div class="f"><label>Перевірив (Прізвище І.П.)</label><input id="checker" value="Мітін В.П."></div>
+<div class="f"><label>Тема роботи (потрапляє в штамп)</label><textarea id="topic" rows="2"></textarea></div>
+</div>
+
+<h2>Мета роботи</h2>
+<label>Кожен пункт з нового рядка</label>
+<textarea id="goal" rows="4"></textarea>
+<h2>Обладнання</h2>
+<textarea id="equip" rows="2">Набір програмного забезпечення.</textarea>
+
+<h2>Порядок виконання роботи</h2>
+<div id="steps"></div>
+<button type="button" id="addStep">+ Крок</button>
+
+<h2>Контрольні питання</h2>
+<div id="qs"></div>
+<button type="button" id="addQ">+ Питання</button>
+
+<h2>Висновок</h2>
+<textarea id="concl" rows="4"></textarea>
+
+<button type="button" class="p" id="go">Завантажити .docx</button>
+<div id="st"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+<script id="gen">
+function parseMath(src){
+  const D=window.docx;
+  const s=src.replace(/<=/g,"≤").replace(/>=/g,"≥").replace(/!=/g,"≠").replace(/->/g,"→").replace(/\*/g,"·").replace(/\bpi\b/g,"π");
+  let i=0;
+  const R=t=>new D.MathRun(t);
+  const sp=()=>{while(i<s.length&&/\s/.test(s[i]))i++};
+  function atom(){
+    sp();const c=s[i];
+    if(c==="("){i++;const n=expr(")");i++;return{n:[new D.MathRoundBrackets({children:n})],inner:n}}
+    if(c==="{"){i++;const n=expr("}");i++;return{n,inner:n}}
+    if(s.startsWith("sqrt",i)){i+=4;const a=atom();const n=[new D.MathRadical({children:a.inner})];return{n,inner:n}}
+    if(/[0-9.,]/.test(c)){let j=i;while(j<s.length&&/[0-9.,]/.test(s[j]))j++;const n=[R(s.slice(i,j))];i=j;return{n,inner:n}}
+    i++;const n=[R(c)];return{n,inner:n};
+  }
+  function factor(){
+    let a=atom(),sup=null,sub=null;
+    while(s[i]==="^"||s[i]==="_"){const o=s[i++];const b=atom();if(o==="^")sup=b.inner;else sub=b.inner}
+    if(sup&&sub){const n=[new D.MathSubSuperScript({children:a.n,subScript:sub,superScript:sup})];return{n,inner:n}}
+    if(sup){const n=[new D.MathSuperScript({children:a.n,superScript:sup})];return{n,inner:n}}
+    if(sub){const n=[new D.MathSubScript({children:a.n,subScript:sub})];return{n,inner:n}}
+    return a;
+  }
+  function term(){
+    let f=factor();sp();
+    while(s[i]==="/"){i++;const g=factor();const n=[new D.MathFraction({numerator:f.inner,denominator:g.inner})];f={n,inner:n};sp()}
+    return f.n;
+  }
+  function expr(end){
+    const out=[];
+    for(;;){sp();if(i>=s.length||s[i]===end)break;out.push(...term())}
+    return out;
+  }
+  const r=expr();
+  return r.length?r:[R(" ")];
+}
+function buildDoc(d){
+  const D=window.docx,F="Times New Roman",A=D.AlignmentType;
+  const mm=v=>Math.round(v*56.7);
+  const cols=[7,10,23,15,10,70,5,5,5,18,17];
+  const sw=(a,b)=>mm(cols.slice(a,b+1).reduce((x,y)=>x+y,0));
+  const B={style:D.BorderStyle.SINGLE,size:8,color:"000000"};
+  const BR={top:B,bottom:B,left:B,right:B};
+  const tr=(t,sz)=>new D.TextRun({text:t||"",italics:true,size:sz||18,font:F});
+  const C=(t,a,b,o={})=>new D.TableCell({
+    width:{size:sw(a,b),type:D.WidthType.DXA},columnSpan:b>a?b-a+1:undefined,rowSpan:o.rs,
+    borders:BR,verticalAlign:D.VerticalAlign.CENTER,margins:{top:0,bottom:0,left:40,right:40},
+    children:[new D.Paragraph({alignment:o.al||A.CENTER,spacing:{before:0,after:0},
+      children:Array.isArray(t)?t:[tr(t,o.sz)]})]});
+  const pg=[new D.TextRun({children:[D.PageNumber.CURRENT],italics:true,size:22,font:F})];
+  const tot=[new D.TextRun({children:[D.PageNumber.TOTAL_PAGES],italics:true,size:22,font:F})];
+  const code=d.kind+" "+d.num;
+  const rows=a=>a.map(c=>new D.TableRow({height:{value:c.h,rule:D.HeightRule.EXACT},children:c.cells}));
+  const blank5=()=>[0,1,2,3,4].map(i=>C("",i,i));
+  const hdr=()=>[C("Зм.",0,0,{sz:14}),C("Арк.",1,1,{sz:14}),C("№ докум.",2,2,{sz:14}),C("Підпис",3,3,{sz:14}),C("Дата",4,4,{sz:14})];
+  const person=(n,name)=>[C(n,0,1,{al:A.LEFT,sz:16}),C(name,2,2,{sz:16}),C("",3,3),C("",4,4)];
+  const H=346,h5=283;
+  const big=[
+    {h:H,cells:[...blank5(),C(code,5,10,{rs:4,sz:40})]},
+    {h:H,cells:blank5()},
+    {h:H,cells:blank5()},
+    {h:H,cells:hdr()},
+    {h:H,cells:[...person("Розроб.",d.student),C(d.topic,5,5,{rs:5,sz:20}),C("Літ.",6,8,{sz:16}),C("Арк.",9,9,{sz:16}),C("Аркушів",10,10,{sz:16})]},
+    {h:H,cells:[...person("Перевір.",d.checker),C("",6,6),C("",7,7),C("",8,8),C(pg,9,9),C(tot,10,10)]},
+    {h:H,cells:[C("",0,1),C("",2,2),C("",3,3),C("",4,4),C(d.group,6,10,{rs:3,sz:30})]},
+    {h:H,cells:person("Н. Контр.","")},
+    {h:H,cells:person("Затверд.","")}
+  ];
+  const small=[
+    {h:h5,cells:[...blank5(),C(code,5,9,{rs:3,sz:32}),C("Арк.",10,10,{sz:16})]},
+    {h:h5,cells:[...blank5(),C(pg,10,10,{rs:2})]},
+    {h:h5,cells:hdr()}
+  ];
+  const mk=r=>new D.Footer({children:[
+    new D.Paragraph({spacing:{before:0,after:0,line:160,lineRule:D.LineRuleType.EXACT}}),
+    new D.Table({width:{size:mm(185),type:D.WidthType.DXA},columnWidths:cols.map(mm),layout:D.TableLayoutType.FIXED,indent:{size:-160,type:D.WidthType.DXA},rows:rows(r)}),
+    new D.Paragraph({spacing:{before:0,after:0,line:20,lineRule:D.LineRuleType.EXACT}})
+  ]});
+
+  const P=(runs,o={})=>new D.Paragraph({alignment:o.al||A.JUSTIFIED,indent:o.ind===false?undefined:{firstLine:709},
+    spacing:{line:264,before:o.before||0,after:0},keepNext:o.kn,
+    children:typeof runs==="string"?[new D.TextRun(runs)]:runs});
+  const Hd=(t,c)=>P([new D.TextRun({text:t,bold:true})],{ind:false,al:c?A.CENTER:A.LEFT,before:120,kn:true});
+  const lines=s=>(s||"").split(/\n/).map(x=>x.trim()).filter(Boolean);
+  const imgs=a=>(a||[]).map(m=>new D.Paragraph({alignment:A.CENTER,spacing:{before:60,after:60},
+    children:[new D.ImageRun({data:m.data,type:"png",transformation:{width:m.w,height:m.h}})]}));
+
+  const ch=[];
+  const goal=lines(d.goal);
+  if(goal.length){ch.push(Hd("МЕТА РОБОТИ:"));goal.forEach(l=>ch.push(P("- "+l.replace(/^[-–•\s]+/,""))));}
+  const eq=lines(d.equip);
+  if(eq.length){ch.push(Hd("ОБЛАДНАННЯ:"));eq.forEach(l=>ch.push(P(l)));}
+  ch.push(Hd("ПОРЯДОК ВИКОНАННЯ РОБОТИ",true));
+  let tn=0;
+  const tableBlock=b=>{
+    const rows=b.text.split(/\n/).filter(r=>r.trim()!=="").map(r=>r.split(r.includes("\t")?"\t":";").map(x=>x.trim()));
+    if(!rows.length)return[];
+    const n=Math.max(...rows.map(r=>r.length)),w=Math.floor(9900/n),out=[];
+    if(b.caption.trim()){tn++;out.push(P("Таблиця "+tn+" – "+b.caption.trim(),{ind:false,al:A.LEFT,before:80,kn:true}));}
+    out.push(new D.Table({width:{size:w*n,type:D.WidthType.DXA},columnWidths:Array(n).fill(w),layout:D.TableLayoutType.FIXED,
+      rows:rows.map((r,ri)=>new D.TableRow({cantSplit:true,children:Array.from({length:n},(_,ci)=>new D.TableCell({
+        width:{size:w,type:D.WidthType.DXA},borders:BR,margins:{top:30,bottom:30,left:80,right:80},
+        children:[new D.Paragraph({alignment:b.header&&ri===0?A.CENTER:A.LEFT,spacing:{before:0,after:0},
+          children:[new D.TextRun({text:r[ci]||"",bold:!!(b.header&&ri===0),size:24})]})]}))}))}));
+    out.push(new D.Paragraph({spacing:{before:0,after:0,line:120,lineRule:D.LineRuleType.EXACT}}));
+    return out;
+  };
+  d.steps.forEach((s,i)=>{
+    let first=true;
+    s.blocks.forEach(b=>{
+      if(b.t==="text"){
+        const t=lines(b.text);
+        t.forEach((l,j)=>ch.push(P((first&&j===0?(i+1)+". ":"")+l)));
+        if(!t.length&&first)ch.push(P((i+1)+"."));
+        first=false;return;
+      }
+      if(first){ch.push(P((i+1)+".",{kn:true}));first=false;}
+      if(b.t==="img")ch.push(...imgs(b.imgs));
+      else if(b.t==="formula"){if(b.text.trim())ch.push(new D.Paragraph({alignment:A.CENTER,spacing:{before:80,after:80},children:[new D.Math({children:parseMath(b.text)})]}));}
+      else if(b.t==="table")ch.push(...tableBlock(b));
+    });
+    if(!s.blocks.length)ch.push(P((i+1)+"."));
+  });
+  const qs=d.qs.filter(x=>x.q.trim()||x.a.trim());
+  if(qs.length){
+    ch.push(Hd("КОНТРОЛЬНІ ПИТАННЯ:",true));
+    qs.forEach((x,i)=>{
+      if(x.q.trim()){
+        ch.push(P((i+1)+". "+x.q.trim(),{kn:true}));
+        lines(x.a).forEach((l,j)=>ch.push(P((j?"":"Відповідь: ")+l)));
+      }else lines(x.a).forEach((l,j)=>ch.push(P((j?"":(i+1)+". ")+l)));
+    });
+  }
+  if(lines(d.concl).length)ch.push(P([new D.TextRun({text:"Висновок: ",bold:true}),new D.TextRun(lines(d.concl).join(" "))],{before:120}));
+
+  const bd=(sp)=>({style:D.BorderStyle.SINGLE,size:12,color:"000000",space:sp});
+  return new D.Document({
+    styles:{default:{document:{run:{font:F,size:28}}}},
+    sections:[{
+      properties:{titlePage:true,page:{
+        size:{width:11906,height:16838},
+        margin:{top:444,right:444,bottom:500,left:1294,header:444,footer:304},
+        borders:{pageBorders:{display:D.PageBorderDisplay.ALL_PAGES,offsetFrom:D.PageBorderOffsetFrom.TEXT,zOrder:D.PageBorderZOrder.FRONT},
+          pageBorderTop:bd(8),pageBorderLeft:bd(8),pageBorderRight:bd(8),pageBorderBottom:bd(1)}}},
+      footers:{first:mk(big),default:mk(small)},
+      children:ch
+    }]
+  });
+}
+</script>
+<script>
+const $=id=>document.getElementById(id);
+const FIELDS=["kind","num","group","student","checker","topic","goal","equip","concl"];
+const NS=()=>({blocks:[{t:"text",text:"",files:[]}]});
+const S={steps:[NS()],qs:[{q:"",a:""}]};
+const KEY="zvit-draft-v1";
+
+function save(){try{
+  const o={};FIELDS.forEach(f=>o[f]=$(f).value);
+  o.steps=S.steps.map(s=>s.blocks.filter(b=>b.t!=="img").map(b=>({t:b.t,text:b.text,caption:b.caption,header:b.header})));o.qs=S.qs;
+  localStorage.setItem(KEY,JSON.stringify(o));}catch(e){}}
+function load(){try{
+  const o=JSON.parse(localStorage.getItem(KEY)||"null");if(!o)return;
+  FIELDS.forEach(f=>{if(o[f]!=null)$(f).value=o[f]});
+  if(o.steps&&o.steps.length)S.steps=o.steps.map(bs=>{let bl=(Array.isArray(bs)?bs:[{t:"text",text:String(bs)}]).map(b=>({files:[],...b}));if(!bl.length)bl=[{t:"text",text:"",files:[]}];return{blocks:bl}});
+  if(o.qs&&o.qs.length)S.qs=o.qs;}catch(e){}}
+
+function el(t,a={},k=[]){const e=document.createElement(t);Object.assign(e,a);k.forEach(x=>e.append(x));return e}
+
+const PH={text:"Текст",formula:"Формула: (a+b)/c   x^2   x_1   sqrt(x)   <=   >=",table:"Таблиця: вставте з Excel/Word або вводьте рядки, комірки через Tab або ;"};
+function renderSteps(){
+  const box=$("steps");box.innerHTML="";
+  S.steps.forEach((s,i)=>{
+    const card=el("div",{className:"it"},[el("b",{textContent:"Крок "+(i+1)})]);
+    s.blocks.forEach((b,bi)=>{
+      const mv=(d)=>{const j=bi+d;if(j<0||j>=s.blocks.length)return;[s.blocks[bi],s.blocks[j]]=[s.blocks[j],s.blocks[bi]];renderSteps();save()};
+      const ctl=el("div",{className:"ctl"},[
+        el("button",{type:"button",textContent:"↑",onclick:()=>mv(-1)}),
+        el("button",{type:"button",textContent:"↓",onclick:()=>mv(1)}),
+        el("button",{type:"button",textContent:"✕",onclick:()=>{s.blocks.splice(bi,1);renderSteps();save()}})]);
+      const bk=el("div",{className:"bk"},[ctl]);
+      if(b.t==="img"){
+        const fi=el("input",{type:"file",accept:"image/*",multiple:true});
+        fi.onchange=()=>{b.files.push(...fi.files);renderSteps()};
+        const th=el("div",{className:"th"});
+        b.files.forEach((f,j)=>{
+          const x=el("b",{textContent:"×"});x.onclick=()=>{b.files.splice(j,1);renderSteps()};
+          th.append(el("span",{},[el("img",{src:URL.createObjectURL(f)}),x]));
+        });
+        bk.append(el("small",{textContent:"Скріншоти"}),fi,th);
+      }else{
+        const ta=el("textarea",{value:b.text||"",placeholder:PH[b.t],className:b.t==="text"?"":"m"});
+        ta.oninput=()=>{b.text=ta.value;save()};
+        bk.append(el("small",{textContent:{text:"Текст",formula:"Формула",table:"Таблиця"}[b.t]}),ta);
+        if(b.t==="table"){
+          const c=el("input",{type:"text",value:b.caption||"",placeholder:"Назва таблиці (необов'язково)"});
+          c.oninput=()=>{b.caption=c.value;save()};
+          const h=el("input",{type:"checkbox",checked:!!b.header,style:"width:auto"});
+          h.onchange=()=>{b.header=h.checked;save()};
+          bk.append(el("div",{style:"height:6px"}),c,el("label",{style:"display:flex;gap:6px;align-items:center"},[h,"Перший рядок — заголовок"]));
+        }
+      }
+      card.append(bk);
+    });
+    const add=el("div",{className:"add"});
+    [["text","+ Текст"],["img","+ Скріншот"],["formula","+ Формула"],["table","+ Таблиця"]].forEach(([t,l])=>
+      add.append(el("button",{type:"button",textContent:l,onclick:()=>{s.blocks.push({t,text:"",files:[]});renderSteps();save()}})));
+    add.append(el("button",{type:"button",textContent:"Видалити крок",onclick:()=>{S.steps.splice(i,1);if(!S.steps.length)S.steps.push(NS());renderSteps();save()}}));
+    card.append(add);box.append(card);
+  });
+}
+function renderQs(){
+  const box=$("qs");box.innerHTML="";
+  S.qs.forEach((x,i)=>{
+    const q=el("input",{type:"text",value:x.q,placeholder:"Питання "+(i+1)+" (можна залишити порожнім)"});
+    q.oninput=()=>{x.q=q.value;save()};
+    const a=el("textarea",{value:x.a,placeholder:"Відповідь"});
+    a.oninput=()=>{x.a=a.value;save()};
+    const del=el("button",{type:"button",textContent:"Видалити"});
+    del.onclick=()=>{S.qs.splice(i,1);if(!S.qs.length)S.qs.push({q:"",a:""});renderQs();save()};
+    box.append(el("div",{className:"it"},[q,el("div",{style:"height:6px"}),a,el("div",{className:"row"},[del])]));
+  });
+}
+
+async function toImg(file){
+  const url=URL.createObjectURL(file),im=new Image();
+  await new Promise((r,j)=>{im.onload=r;im.onerror=j;im.src=url});
+  const k=Math.min(1,1600/im.naturalWidth),w=Math.round(im.naturalWidth*k),h=Math.round(im.naturalHeight*k);
+  const cv=document.createElement("canvas");cv.width=w;cv.height=h;
+  cv.getContext("2d").drawImage(im,0,0,w,h);
+  const blob=await new Promise(r=>cv.toBlob(r,"image/png"));
+  URL.revokeObjectURL(url);
+  const f=Math.min(1,600/im.naturalWidth,380/im.naturalHeight);
+  return {data:new Uint8Array(await blob.arrayBuffer()),w:Math.round(im.naturalWidth*f),h:Math.round(im.naturalHeight*f)};
+}
+
+$("addStep").onclick=()=>{S.steps.push(NS());renderSteps();save()};
+$("addQ").onclick=()=>{S.qs.push({q:"",a:""});renderQs()};
+FIELDS.forEach(f=>$(f).addEventListener("input",save));
+
+$("go").onclick=async()=>{
+  const st=$("st");
+  const v=f=>$(f).value.trim();
+  const miss=[["num","номер"],["group","групу"],["student","прізвище"],["topic","тему"]].filter(([f])=>!v(f)).map(x=>x[1]);
+  if(miss.length){st.textContent="Вкажіть: "+miss.join(", ")+".";return}
+  st.textContent="Формую файл…";
+  try{
+    const d={kind:v("kind"),num:v("num"),group:v("group"),student:v("student"),checker:v("checker"),
+      topic:v("topic"),goal:$("goal").value,equip:$("equip").value,concl:$("concl").value,qs:S.qs,steps:[]};
+    for(const s of S.steps){const bl=[];for(const b of s.blocks){bl.push(b.t==="img"?{t:"img",imgs:await Promise.all(b.files.map(toImg))}:{t:b.t,text:b.text||"",caption:b.caption||"",header:!!b.header})}d.steps.push({blocks:bl})}
+    const blob=await window.docx.Packer.toBlob(buildDoc(d));
+    const name=(d.kind+"_"+d.num+"_"+d.student).replace(/[^\p{L}\p{N}._-]+/gu,"_")+".docx";
+    const a=el("a",{href:URL.createObjectURL(blob),download:name});
+    document.body.append(a);a.click();a.remove();
+    st.textContent="Готово: "+name;
+  }catch(e){st.textContent="Помилка: "+e.message}
+};
+
+load();renderSteps();renderQs();
+</script>
+</body>
+</html>
