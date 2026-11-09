@@ -8,10 +8,10 @@
 :root{--bg:#f3f8fe;--card:#fff;--fg:#17283d;--mut:#5a6f87;--bd:#cfe0f2;--ac:#2972b9;--acf:#fff;--acl:#e4f0fb;--ac2:#36a9e1;--ok:#1b7f4b;--warn:#b26a00;--err:#c0392b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1a2b;--card:#15263c;--fg:#e5eef9;--mut:#94a9c3;--bd:#2a4262;--ac:#5aa6e8;--acf:#0a1626;--acl:#1b3452;--ok:#52c58a;--warn:#e0a23c;--err:#ef7d70}}
 :root[data-theme="dark"]{--bg:#0e1a2b;--card:#15263c;--fg:#e5eef9;--mut:#94a9c3;--bd:#2a4262;--ac:#5aa6e8;--acf:#0a1626;--acl:#1b3452;--ok:#52c58a;--warn:#e0a23c;--err:#ef7d70}
-html{color-scheme:light dark}
+html{color-scheme:light dark;font-size:17px}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{margin:0;background:var(--bg);color:var(--fg);font:1rem/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 header{background:linear-gradient(110deg,#2972b9,#36a9e1);color:#fff}
 .hd{max-width:820px;margin:0 auto;padding:12px 16px;display:flex;gap:12px;align-items:center}
 .chip{background:#fff;border-radius:12px;padding:4px 8px;display:flex;flex:none}
@@ -19,11 +19,11 @@ header{background:linear-gradient(110deg,#2972b9,#36a9e1);color:#fff}
 .hd b{display:block;font-size:.95rem;line-height:1.25}
 .hd small{opacity:.9}
 .hd div{flex:1;min-width:0}
-#th{background:rgba(255,255,255,.22);color:#fff;border:0;border-radius:50%;width:40px;height:40px;padding:0;display:grid;place-items:center;cursor:pointer;flex:none}#th:hover{background:rgba(255,255,255,.34)}#th svg{display:block}
+#th,#fs{background:rgba(255,255,255,.22);color:#fff;border:0;border-radius:50%;width:40px;height:40px;padding:0;display:grid;place-items:center;cursor:pointer;flex:none}#th:hover,#fs:hover{background:rgba(255,255,255,.34)}#fs{font-weight:700;font-size:.9rem}#th svg{display:block}
 nav{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--bd);overflow-x:auto;white-space:nowrap}
 nav div{max-width:820px;margin:0 auto;display:flex}
 nav div{gap:8px;padding:10px 12px}
-nav button{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--bd);border-radius:999px;padding:6px 14px 6px 6px;background:var(--card);color:var(--fg);font:inherit;font-size:.92rem;cursor:pointer;transition:background .15s,border-color .15s}
+nav button{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--bd);border-radius:999px;padding:6px 14px 6px 6px;background:var(--card);color:var(--fg);font:inherit;font-size:1rem;cursor:pointer;transition:background .15s,border-color .15s}
 nav button i{width:26px;height:26px;border-radius:50%;background:var(--acl);color:var(--ac);font-style:normal;font-size:.8rem;font-weight:700;display:grid;place-items:center}
 nav button:hover{border-color:var(--ac)}
 nav button.on{background:var(--ac);border-color:var(--ac);color:var(--acf);font-weight:600}
@@ -31,24 +31,24 @@ nav button.on i{background:rgba(255,255,255,.28);color:inherit}
 nav button.done i{background:var(--ok);color:#fff}
 main{max-width:820px;margin:0 auto;padding:16px}
 h2{font-size:1.1rem;margin:.2em 0 .6em;color:var(--ac)}
-label{display:block;font-size:.85rem;color:var(--mut);margin:.7em 0 .2em}
+label{display:block;font-size:.95rem;color:var(--mut);margin:.7em 0 .2em}
 input,select,textarea{width:100%;padding:10px;border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--fg);font:inherit}
-textarea{min-height:80px;resize:vertical}
+textarea{min-height:90px;resize:vertical;line-height:1.5}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--ac2);outline-offset:0}
 .g{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
 .g .f{grid-column:1/-1}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;margin:10px 0}
 .bk{border:1px dashed var(--bd);border-radius:10px;padding:8px;margin:8px 0;background:var(--bg)}
-.bk small{color:var(--mut);display:block;margin-bottom:4px}
+.bk small{color:var(--mut);display:block;margin-bottom:4px;font-size:.9rem}
 .ctl{display:flex;gap:4px;justify-content:flex-end;margin-bottom:4px}
 .ctl button{padding:2px 9px}
 .m{font-family:ui-monospace,Menlo,Consolas,monospace}
 .row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
 button{font:inherit;padding:9px 14px;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--fg);cursor:pointer}
-button.sm{padding:5px 10px;font-size:.88rem}
+button.sm{padding:6px 12px;font-size:.95rem}
 button.p{background:var(--ac);color:var(--acf);border-color:var(--ac);font-weight:600}
 button:disabled{opacity:.5}
-.dz{border:2px dashed var(--ac2);background:var(--acl);border-radius:10px;padding:14px;text-align:center;color:var(--mut);font-size:.9rem}
+.dz{border:2px dashed var(--ac2);background:var(--acl);border-radius:10px;padding:14px;text-align:center;color:var(--mut);font-size:.95rem}
 .dz:focus{outline:2px solid var(--ac);background:var(--card)}
 .th{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
 .th span{position:relative}
@@ -65,7 +65,7 @@ button:disabled{opacity:.5}
 .ck li{margin:4px 0;list-style:none}
 .ck{padding:0}
 .ck .e{color:var(--err)}.ck .w{color:var(--warn)}.ck .o{color:var(--ok)}
-#st{margin-top:10px;font-size:.92rem;min-height:1.3em}
+#st{margin-top:10px;font-size:1rem;min-height:1.3em}
 @media (max-width:520px){.g{grid-template-columns:1fr}}
 </style>
 </head>
@@ -73,6 +73,7 @@ button:disabled{opacity:.5}
 <header><div class="hd">
 <span class="chip"><img alt="ЗАФК" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDI1LjAuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgYmFzZVByb2ZpbGU9InRpbnkiIGlkPSLQodC70L7QuV8xIgoJIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgNTc2LjMgMzM4IgoJIG92ZXJmbG93PSJ2aXNpYmxlIiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPHBhdGggZmlsbD0iIzI5NzJCOSIgZD0iTTIzMi42LDE4Ny45YzEuNSwyLjIsMi4yLDQuNywyLjIsNy41YzAsNC0xLjQsNy41LTQuMywxMC42Yy0yLjksMy02LjcsNS40LTExLjUsNy4xCgljLTQuOCwxLjctMTAsMi41LTE1LjUsMi41Yy00LjIsMC04LjQtMC41LTEyLjYtMS41Yy00LjEtMS04LTIuNS0xMS42LTQuNmw3LjUtMTEuOWMyLjUsMS40LDUuMiwyLjQsOC4xLDMuMmMzLDAuNyw1LjksMS4xLDguNywxLjEKCWM0LjEsMCw3LjUtMC43LDEwLjItMi4xYzIuNy0xLjQsNC4xLTMuMyw0LjEtNS44YzAtMy0yLjQtNC42LTcuMi00LjZoLTE1LjZsMi41LTEyLjVoMTQuM2MyLjQsMCw0LjQtMC41LDUuOS0xLjYKCWMxLjUtMS4xLDIuMi0yLjQsMi4yLTQuMWMwLTEuOC0wLjktMy4xLTIuNi00LjFjLTEuNy0wLjktNC0xLjQtNy0xLjRjLTIuNSwwLTUuMSwwLjQtOCwxLjFjLTIuOSwwLjctNS44LDEuNy04LjYsMy4xbC0yLjUtMTIuOQoJYzcuMi0zLjIsMTQuNS00LjcsMjEuNy00LjdjNC42LDAsOC44LDAuNiwxMi42LDEuOWMzLjgsMS4zLDYuOCwzLjEsOC45LDUuNWMyLjIsMi40LDMuMyw1LjIsMy4zLDguNGMwLDMuMi0xLDYuMS0zLjEsOC43CgljLTIsMi42LTQuOCw0LjYtOC4yLDZDMjI5LjEsMTg0LDIzMS4yLDE4NS43LDIzMi42LDE4Ny45eiIvPgo8cGF0aCBmaWxsPSIjMjk3MkI5IiBkPSJNMjg3LjksMjAyLjNoLTI1LjZsLTcsMTEuN2gtMThsMzguNi02MC4yaDE2LjhsMTQuNSw2MC4yaC0xNi45TDI4Ny45LDIwMi4zeiBNMjg1LjQsMTg5LjhsLTQtMTkuNQoJbC0xMS41LDE5LjVIMjg1LjR6Ii8+CjxwYXRoIGZpbGw9IiMyOTcyQjkiIGQ9Ik00NTQuMywxODMuNGwxMi44LDMwLjZoLTE4LjFsLTktMjMuMWgtOC42bC00LjYsMjMuMWgtMTdsMTItNjAuMmgxN2wtNC42LDIzLjRoNy4ybDE5LTIzLjRoMTguOQoJTDQ1NC4zLDE4My40eiIvPgo8dGV4dCB0cmFuc2Zvcm09Im1hdHJpeCgxIDAgMCAxIDIwOC41NjY5IDI1Ni43MTQ4KSIgZmlsbD0iIzI5NzJCOSIgZm9udC1mYW1pbHk9IidNb250c2VycmF0LUJvbGRJdGFsaWMnIiBmb250LXNpemU9IjI5LjA3NTFweCI+0ZY8L3RleHQ+Cjx0ZXh0IHRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIDEgMjE3LjQwNTggMjU2LjcxNDgpIiBmaWxsPSIjMjk3MkI5IiBmb250LWZhbWlseT0iJ01vbnRzZXJyYXQtQm9sZEl0YWxpYyciIGZvbnQtc2l6ZT0iMjkuMDc1MXB4Ij7QvDwvdGV4dD4KPHRleHQgdHJhbnNmb3JtPSJtYXRyaXgoMSAwIDAgMSAyNDEuMTAxMSAyNTYuNzE0OCkiIGZpbGw9IiMyOTcyQjkiIGZvbnQtZmFtaWx5PSInTW9udHNlcnJhdC1Cb2xkSXRhbGljJyIgZm9udC1zaXplPSIyOS4wNzUxcHgiPi48L3RleHQ+Cjx0ZXh0IHRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIDEgMjQ4LjcxODMgMjU2LjcxNDgpIiBmaWxsPSIjMjk3MkI5IiBmb250LWZhbWlseT0iJ01vbnRzZXJyYXQtQm9sZEl0YWxpYyciIGZvbnQtc2l6ZT0iMjkuMDc1MXB4Ij4gPC90ZXh0Pgo8dGV4dCB0cmFuc2Zvcm09Im1hdHJpeCgxIDAgMCAxIDI1Ni45NDY4IDI1Ni43MTQ4KSIgZmlsbD0iIzI5NzJCOSIgZm9udC1mYW1pbHk9IidNb250c2VycmF0LUJvbGRJdGFsaWMnIiBmb250LXNpemU9IjI5LjA3NTFweCI+0J48L3RleHQ+Cjx0ZXh0IHRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIDEgMjgxLjAyMSAyNTYuNzE0OCkiIGZpbGw9IiMyOTcyQjkiIGZvbnQtZmFtaWx5PSInTW9udHNlcnJhdC1Cb2xkSXRhbGljJyIgZm9udC1zaXplPSIyOS4wNzUxcHgiPi48L3RleHQ+Cjx0ZXh0IHRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIDEgMjg4LjYzODIgMjU2LjcxNDgpIiBmaWxsPSIjMjk3MkI5IiBmb250LWZhbWlseT0iJ01vbnRzZXJyYXQtQm9sZEl0YWxpYyciIGZvbnQtc2l6ZT0iMjkuMDc1MXB4Ij4gPC90ZXh0Pgo8dGV4dCB0cmFuc2Zvcm09Im1hdHJpeCgxIDAgMCAxIDI5Ni44NjY3IDI1Ni43MTQ4KSIgZmlsbD0iIzI5NzJCOSIgZm9udC1mYW1pbHk9IidNb250c2VycmF0LUJvbGRJdGFsaWMnIiBmb250LXNpemU9IjI5LjA3NTFweCI+0JM8L3RleHQ+Cjx0ZXh0IHRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIDEgMzEzLjU4NDUgMjU2LjcxNDgpIiBmaWxsPSIjMjk3MkI5IiBmb250LWZhbWlseT0iJ01vbnRzZXJyYXQtQm9sZEl0YWxpYyciIGZvbnQtc2l6ZT0iMjkuMDc1MXB4Ij4uPC90ZXh0Pgo8dGV4dCB0cmFuc2Zvcm09Im1hdHJpeCgxIDAgMCAxIDMyMS4yMDE3IDI1Ni43MTQ4KSIgZmlsbD0iIzI5NzJCOSIgZm9udC1mYW1pbHk9IidNb250c2VycmF0LUJvbGRJdGFsaWMnIiBmb250LXNpemU9IjI5LjA3NTFweCI+IDwvdGV4dD4KPHRleHQgdHJhbnNmb3JtPSJtYXRyaXgoMSAwIDAgMSAzMjkuNDMwMiAyNTYuNzE0OCkiIGZpbGw9IiMyOTcyQjkiIGZvbnQtZmFtaWx5PSInTW9udHNlcnJhdC1Cb2xkSXRhbGljJyIgZm9udC1zaXplPSIyOS4wNzUxcHgiPtCGPC90ZXh0Pgo8dGV4dCB0cmFuc2Zvcm09Im1hdHJpeCgxIDAgMCAxIDMzOC45NjYzIDI1Ni43MTQ4KSIgZmlsbD0iIzI5NzJCOSIgZm9udC1mYW1pbHk9IidNb250c2VycmF0LUJvbGRJdGFsaWMnIiBmb250LXNpemU9IjI5LjA3NTFweCI+0LI8L3RleHQ+Cjx0ZXh0IHRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIDEgMzU3LjA1MTMgMjU2LjcxNDgpIiBmaWxsPSIjMjk3MkI5IiBmb250LWZhbWlseT0iJ01vbnRzZXJyYXQtQm9sZEl0YWxpYyciIGZvbnQtc2l6ZT0iMjkuMDc1MXB4Ij7RhzwvdGV4dD4KPHRleHQgdHJhbnNmb3JtPSJtYXRyaXgoMSAwIDAgMSAzNzUuNDU1NiAyNTYuNzE0OCkiIGZpbGw9IiMyOTcyQjkiIGZvbnQtZmFtaWx5PSInTW9udHNlcnJhdC1Cb2xkSXRhbGljJyIgZm9udC1zaXplPSIyOS4wNzUxcHgiPtC1PC90ZXh0Pgo8dGV4dCB0cmFuc2Zvcm09Im1hdHJpeCgxIDAgMCAxIDM5My44NTk5IDI1Ni43MTQ4KSIgZmlsbD0iIzI5NzJCOSIgZm9udC1mYW1pbHk9IidNb250c2VycmF0LUJvbGRJdGFsaWMnIiBmb250LXNpemU9IjI5LjA3NTFweCI+0L08L3RleHQ+Cjx0ZXh0IHRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIDEgNDE0LjAzNzYgMjU2LjcxNDgpIiBmaWxsPSIjMjk3MkI5IiBmb250LWZhbWlseT0iJ01vbnRzZXJyYXQtQm9sZEl0YWxpYyciIGZvbnQtc2l6ZT0iMjkuMDc1MXB4Ij7QujwvdGV4dD4KPHRleHQgdHJhbnNmb3JtPSJtYXRyaXgoMSAwIDAgMSA0MzIuMTUwOSAyNTYuNzE0OCkiIGZpbGw9IiMyOTcyQjkiIGZvbnQtZmFtaWx5PSInTW9udHNlcnJhdC1Cb2xkSXRhbGljJyIgZm9udC1zaXplPSIyOS4wNzUxcHgiPtCwPC90ZXh0Pgo8cGF0aCBmaWxsPSIjMkQyRTgzIiBkPSJNNTMuMiwxNjEuOGMwLTMzLjIsMTguOC02My44LDUwLjQtODguMUM1OSw5OC4xLDMxLDEzMy4yLDMxLDE3Mi4zYzAsNzMuNSw5OC44LDEzMy4xLDIyMC43LDEzMy4xCgljOC44LDAsMTcuNi0wLjMsMjYuMS0wLjlDMTUyLjcsMzAwLjYsNTMuMiwyMzguMiw1My4yLDE2MS44eiIvPgo8cGF0aCBmaWxsPSIjMUQ3MUI4IiBkPSJNOTUuOSwxNjYuN2MwLTgwLjMsMTAxLjQtMTQ1LjMsMjI2LjQtMTQ1LjNjMTMuOSwwLDI3LjYsMC44LDQwLjgsMi40Yy0yMi42LTUtNDYuOC03LjctNzItNy43CglDMTY5LjMsMTYsNzAuNCw3OS40LDcwLjQsMTU3LjdjMCw1Mi45LDQ1LjEsOTksMTEyLDEyMy4zQzEyOS43LDI1NC40LDk1LjksMjEzLDk1LjksMTY2Ljd6Ii8+CjxwYXRoIGZpbGw9IiMzNkE5RTEiIGQ9Ik0xMjQsMTkzLjdjMC04MC4zLDEwMS40LTE0NS4zLDIyNi41LTE0NS4zYzY0LjEsMCwxMjEuOSwxNy4xLDE2My4xLDQ0LjVjLTQwLjEtMzUuNi0xMDUuMy01OC44LTE3OS01OC44CgljLTEyMS45LDAtMjIwLjcsNjMuNC0yMjAuNywxNDEuN2MwLDIwLDYuNSwzOS4xLDE4LjIsNTYuNEMxMjYuOCwyMjAsMTI0LDIwNy4xLDEyNCwxOTMuN3oiLz4KPHBhdGggZmlsbD0iIzM2QTlFMSIgZD0iTTQ2Mi44LDEwMC43Yy0xLjMtMy4zLTkuOC0wLjctOS44LTAuN2wtMTUuMyw1LjJsLTUuMy00LjNsMC45LTAuOGMwLjYtMC42LDAuNi0xLjYsMC4xLTIuMgoJYy0wLjYtMC42LTEuNi0wLjYtMi4yLTAuMWwtMS4yLDEuMWwtMi45LTIuNGwwLjYtMC42YzAuNi0wLjYsMC42LTEuNiwwLjEtMi4yYy0wLjYtMC42LTEuNi0wLjYtMi4yLTAuMWwtMC45LDAuOWwtNy4xLTUuOQoJYy0wLjgtMC43LTEuOS0wLjktMi45LTAuNWMtMiwwLjctMi43LDMtMS41LDQuN2wxMiwxNi41bC0xNS44LDcuNGwtNS0zLjVjLTAuNi0wLjQtMS40LTAuNS0yLjEtMC4zYy0xLjUsMC41LTIuMSwyLjMtMS4yLDMuN2wzLDMuNwoJbC0yLjcsMC44Yy0wLjYsMC4yLTEsMC44LTAuOCwxLjVjMC4yLDAuNiwwLjgsMSwxLjUsMC44bDIuNy0wLjhsMC4xLDQuOWMwLjEsMS42LDEuNywyLjcsMy4yLDIuMmMwLjctMC4yLDEuMy0wLjgsMS41LTEuNWwxLjktNS44CglsMTYuNy00LjVsMC41LDIwLjRjMCwyLjEsMi4xLDMuNSw0LDIuOGMxLTAuMywxLjgtMS4yLDItMi4ybDIuNC0xMGwxLjUsMC4zYzAuOCwwLjIsMS42LTAuNCwxLjgtMS4yYzAuMi0wLjgtMC40LTEuNi0xLjItMS44CglsLTEuMy0wLjNsMC45LTMuNmwyLjQsMC41YzAuOCwwLjIsMS42LTAuNCwxLjgtMS4yYzAuMi0wLjgtMC40LTEuNi0xLjItMS44bC0yLjItMC40bDEuNC01LjdsMTUuMS01LjEKCUM0NTUuNywxMDguNCw0NjQuNiwxMDUsNDYyLjgsMTAwLjd6Ii8+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzI5NzJCOSIgc3Ryb2tlLW1pdGVybGltaXQ9IjEwIiBzdHJva2UtZGFzaGFycmF5PSIyIiBkPSJNMzk4LjksMTI1LjNjLTEuNywxLjQtMi44LDMuNy00LDUuNwoJYy0xLjYsMi43LTMuNiw1LjItNS43LDcuMmMtMS41LDEuNC05LjcsMS40LTEzLjUtMi4zYy0yLjYtMi42LTQtNy0wLjItOC4zYzYuMS0yLDEzLjEsNi40LDEzLjgsOC40YzAuNywyLDAuMyw0LjUtMC44LDYuMwoJYy0xLjEsMS44LTIuOCwyLjktNC41LDMuNmMtMy4xLDEuMy02LjUsMS4yLTkuNywxLjljLTMuMywwLjctNi43LDIuMy04LjQsNS45Ii8+CjxwYXRoIGZpbGw9IiMzNkE5RTEiIGQ9Ik0zOTQuNSwxOTUuNGMtMyw0LjQtNy4zLDcuOS0xMi44LDEwLjVjLTUuNiwyLjYtMTIuMiw0LTE5LjksNC40bDAsMGMtMC44LDMuOC00LjEsNi41LTgsNi41aC05bDEuNC02LjcKCWMtOC43LTAuOC0xNS4zLTMuMS0xOS44LTYuOGMtNC41LTMuOC02LjgtOC45LTYuOC0xNS40YzAtNS44LDEuNC0xMC45LDQuMy0xNS40YzIuOS00LjQsNy4xLTgsMTIuNy0xMC43YzUuNi0yLjcsMTIuMy00LjIsMjAuMS00LjcKCWwwLDBjMC43LTMuNiwzLjktNi4yLDcuNS02LjJoOS4zbC0xLjMsNi4zYzguNywwLjcsMTUuMywzLDE5LjgsNi44YzQuNSwzLjgsNi44LDkuMSw2LjgsMTUuN0MzOTksMTg1LjcsMzk3LjUsMTkxLDM5NC41LDE5NS40egoJIE0zMzkuNCwxOTMuM2MxLjksMS44LDUuMSwzLDkuNSwzLjZsNS4zLTI2LjRjLTYuMSwwLjctMTAuNiwyLjMtMTMuNCw0LjdjLTIuOSwyLjUtNC4zLDUuOS00LjMsMTAuMwoJQzMzNi40LDE4OC45LDMzNy40LDE5MS41LDMzOS40LDE5My4zeiBNMzc3LjgsMTkyLjRjMi45LTIuNSw0LjQtNiw0LjQtMTAuNGMwLTMuNS0xLTYuMi0zLThjLTItMS44LTUuMS0zLTkuNC0zLjVsLTUuMywyNi41CglDMzcwLjUsMTk2LjQsMzc0LjksMTk0LjksMzc3LjgsMTkyLjR6Ii8+CjxwYXRoIGZpbGw9IiMyRDJFODMiIGQ9Ik01MDMuOCw3MWMxMiwyLDEzLjIsMy42LDE0LjcsMTkuNGMxLjUtMTUuOSwyLjctMTcuNSwxNC43LTE5LjRjLTEyLTItMTMuMi0zLjYtMTQuNy0xOS40CglDNTE2LjksNjcuNSw1MTUuNyw2OS4xLDUwMy44LDcxeiIvPgo8cGF0aCBmaWxsPSIjMzZBOUUxIiBkPSJNNDY4LjYsMTE0LjNjNS42LDAuOSw2LjIsMS43LDYuOSw5LjFjMC43LTcuNSwxLjMtOC4yLDYuOS05LjFjLTUuNi0wLjktNi4yLTEuNy02LjktOS4xCglDNDc0LjgsMTEyLjYsNDc0LjMsMTEzLjQsNDY4LjYsMTE0LjN6Ii8+CjxwYXRoIGZpbGw9IiMxRDcxQjgiIGQ9Ik00NDQuNiw4Ni45YzUsMC44LDUuNSwxLjUsNi4xLDguMWMwLjYtNi42LDEuMS03LjMsNi4xLTguMWMtNS0wLjgtNS41LTEuNS02LjEtOC4xCglDNDUwLjEsODUuNSw0NDkuNiw4Ni4xLDQ0NC42LDg2Ljl6Ii8+Cjwvc3ZnPgo="></span>
 <div><b>Запорізький авіаційний фаховий коледж ім. О. Г. Івченка</b><small>Генератор звітів ЛР/ПР зі штампами</small></div>
+<button id="fs" type="button" title="Розмір шрифту" aria-label="Розмір шрифту">Aa</button>
 <button id="th" type="button" title="Світла / темна тема" aria-label="Перемкнути тему"></button>
 </div></header>
 <nav><div id="tabs"></div></nav>
@@ -318,6 +319,12 @@ function show(n){
 TABS.forEach((t,i)=>$("tabs").append(el("button",{type:"button",innerHTML:"<i>"+(i+1)+"</i>"+t,onclick:()=>show(i)})));
 $("back").onclick=()=>show(tab-1);$("next").onclick=()=>show(tab+1);
 
+/* --- розмір шрифту --- */
+const FS=[17,19,21];let fi=1;
+try{const v0=+localStorage.getItem("zvit-fs");if(FS.includes(v0))fi=FS.indexOf(v0);else fi=0}catch(e){fi=0}
+const setFs=()=>{document.documentElement.style.fontSize=FS[fi]+"px";$("fs").title="Розмір шрифту: "+FS[fi]+"px (натисніть, щоб змінити)";try{localStorage.setItem("zvit-fs",FS[fi])}catch(e){}};
+$("fs").onclick=()=>{fi=(fi+1)%FS.length;setFs()};setFs();
+
 /* --- тема --- */
 const SV=d=>'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg>';
 const ICON={sun:SV('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'),moon:SV('<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>')};
@@ -444,8 +451,8 @@ $("go").onclick=async()=>{
 
 /* --- нова робота --- */
 $("newW").onclick=()=>{
-  if(!confirm("Почати нову роботу? Номер, тема, мета, кроки, питання й висновок будуть очищені (група, прізвище та «Перевірив» залишаться)."))return;
-  ["num","topic","goal","concl"].forEach(k=>$(k).value="");$("equip").value="Набір програмного забезпечення.";
+  if(!confirm("Почати нову роботу? Усі поля, крім типу роботи й вашого прізвища, будуть очищені (номер, група, «Перевірив», тема, мета, обладнання, кроки, питання, висновок)."))return;
+  ["num","group","checker","topic","goal","equip","concl"].forEach(k=>$(k).value="");
   S.steps=[NS()];S.qs=[{q:"",a:""}];renderSteps();renderQs();show(0);save();
 };
 
