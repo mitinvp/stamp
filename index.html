@@ -450,76 +450,51 @@ $("newW").onclick=()=>{
   S.steps=[NS()];S.qs=[{q:"",a:""}];$("impst").textContent="";renderSteps();renderQs();show(0);save();
 };
 
-/* --- імпорт готового .docx --- */
-const NSW="http://schemas.openxmlformats.org/wordprocessingml/2006/main",NSM="http://schemas.openxmlformats.org/officeDocument/2006/math",NSR="http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+/* --- імпорт із .docx: лише тема, мета, обладнання --- */
+const NSW="http://schemas.openxmlformats.org/wordprocessingml/2006/main";
 const inBox=(n,stop)=>{for(let p=n.parentNode;p&&p!==stop;p=p.parentNode)if(p.localName==="txbxContent")return true;return false};
+const isKw=t=>/^(мета|обладнання|порядок|хід|завдання|теоретичн|теорія|контрольн|висновок|література|короткі)/i.test(t);
+const isCaps=t=>t.length<90&&/[А-ЯІЇЄҐA-Z]/.test(t)&&t===t.toUpperCase();
 async function importDocx(file){
-  const Z=await JSZip.loadAsync(file),P=new DOMParser();
-  const xml=P.parseFromString(await Z.file("word/document.xml").async("string"),"application/xml");
-  const rels={},rx=Z.file("word/_rels/document.xml.rels");
-  if(rx)[...P.parseFromString(await rx.async("string"),"application/xml").getElementsByTagName("Relationship")].forEach(r=>rels[r.getAttribute("Id")]=r.getAttribute("Target"));
-  const imgsOf=async p=>{const out=[];for(const e of p.getElementsByTagName("*")){
-    if(e.localName!=="blip"||inBox(e,p))continue;
-    const t=rels[e.getAttributeNS(NSR,"embed")];if(!t||!/\.(png|jpe?g|gif|bmp|webp)$/i.test(t))continue;
-    const f=Z.file("word/"+t.replace(/^\/?(word\/)?/,""));if(!f)continue;
-    const ext=t.split(".").pop().toLowerCase();out.push(new File([await f.async("blob")],"img."+ext,{type:"image/"+(ext==="jpg"?"jpeg":ext)}))}return out};
-  const ptext=p=>{let t="";for(const e of p.getElementsByTagName("*")){
-    if(e.localName==="t"&&e.namespaceURI===NSW&&!inBox(e,p))t+=e.textContent;
-    else if(e.localName==="tab"&&e.parentNode.localName==="r")t+=" "}return t.replace(/\s+/g," ").trim()};
-  const body=xml.getElementsByTagNameNS(NSW,"body")[0],items=[];let math=0;
-  for(const n of body.children){
-    if(n.localName==="p"){items.push({k:"p",t:ptext(n),imgs:await imgsOf(n)});math+=n.getElementsByTagNameNS(NSM,"oMath").length}
-    else if(n.localName==="tbl")items.push({k:"t",rows:[...n.getElementsByTagNameNS(NSW,"tr")].map(tr=>[...tr.children].filter(c=>c.localName==="tc").map(tc=>[...tc.getElementsByTagNameNS(NSW,"t")].map(x=>x.textContent).join("").trim()))});
+  const Z=await JSZip.loadAsync(file);
+  const xml=new DOMParser().parseFromString(await Z.file("word/document.xml").async("string"),"application/xml");
+  const body=xml.getElementsByTagNameNS(NSW,"body")[0],paras=[];
+  for(const n of body.children){if(n.localName!=="p")continue;
+    let t="";for(const e of n.getElementsByTagName("*")){
+      if(e.localName==="t"&&e.namespaceURI===NSW&&!inBox(e,n))t+=e.textContent;
+      else if(e.localName==="tab"&&e.parentNode.localName==="r")t+=" "}
+    paras.push(t.replace(/\s+/g," ").trim())}
+  const goal=[],equip=[];let sec="",topic="";
+  for(const t of paras){
+    if(!t)continue;
+    const tm=/^тема(\s+роботи)?\s*[:.]\s*(.+)$/i.exec(t);if(tm&&!topic){topic=tm[2];continue}
+    if(/^мета роботи/i.test(t)){sec="goal";const r=t.replace(/^мета роботи\s*:?\s*/i,"");if(r)goal.push(r);continue}
+    if(/^обладнання/i.test(t)){sec="equip";const r=t.replace(/^обладнання\s*:?\s*/i,"");if(r)equip.push(r);continue}
+    if(sec&&(isKw(t)||(isCaps(t)&&(sec==="goal"?goal:equip).length))){sec="";continue}
+    if(sec==="goal"&&goal.length<8)goal.push(t.replace(/^[-–•\s]+/,""));
+    else if(sec==="equip"&&equip.length<3&&t.length<250)equip.push(t);
+    else if(sec)sec="";
   }
-  let sec="";const goal=[],equip=[],steps=[],qs=[],concl=[];let cur=null;const NUM=/^\s*\d+[.)]\s*/;
-  for(const it of items){
-    if(it.k==="p"){
-      const U=it.t.toUpperCase();let m;
-      if(U.startsWith("МЕТА РОБОТИ")){sec="goal";const r=it.t.replace(/^мета роботи\s*:?\s*/i,"");if(r)goal.push(r);continue}
-      if(U.startsWith("ОБЛАДНАННЯ")){sec="equip";const r=it.t.replace(/^обладнання\s*:?\s*/i,"");if(r)equip.push(r);continue}
-      if(U.startsWith("ПОРЯДОК ВИКОНАННЯ")){sec="steps";continue}
-      if(U.startsWith("КОНТРОЛЬНІ ПИТАННЯ")){sec="qs";continue}
-      if(U.startsWith("ВИСНОВОК")){sec="concl";const r=it.t.replace(/^висновок\s*:?\s*/i,"");if(r)concl.push(r);continue}
-    }
-    if(sec==="goal"&&it.k==="p"&&it.t)goal.push(it.t.replace(/^[-–•\s]+/,""));
-    else if(sec==="equip"&&it.k==="p"&&it.t)equip.push(it.t);
-    else if(sec==="concl"&&it.k==="p"&&it.t)concl.push(it.t);
-    else if(sec==="steps"){
-      if(it.k==="p"&&it.t&&NUM.test(it.t)){cur={blocks:[{t:"text",text:it.t.replace(NUM,""),files:[]}]};steps.push(cur)}
-      else{
-        if(!cur){if(!(it.t||(it.imgs&&it.imgs.length)||it.k==="t"))continue;cur={blocks:[]};steps.push(cur)}
-        const cm=it.k==="p"&&/^Рисунок\s*\d+\s*[–—-]\s*(.*)$/i.exec(it.t),lb=cur.blocks[cur.blocks.length-1];
-        if(cm&&lb&&lb.t==="img"&&!lb.caption)lb.caption=cm[1];
-        else if(it.k==="p"&&it.t){const tb=cur.blocks.find(b=>b.t==="text");if(tb&&cur.blocks[cur.blocks.length-1]===tb)tb.text+="\n"+it.t;else cur.blocks.push({t:"text",text:it.t,files:[]})}
-        if(it.k==="p"&&it.imgs.length)cur.blocks.push({t:"img",text:"",caption:"",files:it.imgs});
-        if(it.k==="t")cur.blocks.push({t:"table",text:it.rows.map(r=>r.join("\t")).join("\n"),caption:"",header:true,files:[]});
-      }
-    }else if(sec==="qs"&&it.k==="p"&&it.t){
-      if(NUM.test(it.t)){const x=it.t.replace(NUM,"");qs.push(/\?\s*$/.test(x)?{q:x,a:""}:{q:"",a:x})}
-      else if(qs.length)qs[qs.length-1].a+=(qs[qs.length-1].a?"\n":"")+it.t;
-    }
+  if(!topic){
+    const boxes=[...new Set([...xml.getElementsByTagNameNS(NSW,"txbxContent")].map(b=>[...b.getElementsByTagNameNS(NSW,"t")].map(x=>x.textContent).join("").replace(/\s+/g," ").trim()).filter(Boolean))];
+    topic=boxes.filter(b=>b.length>25).sort((a,b)=>b.length-a.length)[0]||"";
   }
-  steps.forEach(s=>{if(!s.blocks.length)s.blocks.push({t:"text",text:"",files:[]})});
-  // штамп із текстових полів
-  const boxes=[...new Set([...xml.getElementsByTagNameNS(NSW,"txbxContent")].map(b=>[...b.getElementsByTagNameNS(NSW,"t")].map(x=>x.textContent).join("").replace(/\s+/g," ").trim()).filter(Boolean))];
-  const code=boxes.map(b=>/^(ПР|ЛР)\s*№?\s*([\d.]+)/i.exec(b)).find(Boolean);
-  const topic=boxes.filter(b=>b.length>25).sort((a,b)=>b.length-a.length)[0];
-  return{goal,equip,steps,qs,concl,code,topic,math,imgs:steps.reduce((n,s)=>n+s.blocks.reduce((m,b)=>m+(b.t==="img"?b.files.length:0),0),0)};
+  return{goal,equip,topic};
 }
 $("imp").onclick=()=>$("impf").click();
 $("impf").onchange=async()=>{
   const f=$("impf").files[0];$("impf").value="";if(!f)return;
   const st=$("impst");
-  if((v("goal")||S.steps.some(s=>s.blocks.some(b=>b.text||(b.files&&b.files.length))))&&!confirm("Імпорт замінить мету, кроки, питання й висновок. Продовжити?"))return;
+  if((v("goal")||v("topic"))&&!confirm("Імпорт замінить тему, мету й обладнання. Продовжити?"))return;
   st.textContent="Читаю файл…";
   try{
     const r=await importDocx(f);
-    $("goal").value=r.goal.join("\n");if(r.equip.length)$("equip").value=r.equip.join("\n");$("concl").value=r.concl.join("\n");
-    S.steps=r.steps.length?r.steps:[NS()];S.qs=r.qs.length?r.qs:[{q:"",a:""}];
-    if(r.code){if(!v("num"))$("num").value=r.code[2];$("kind").value=/^ЛР/i.test(r.code[1])?"ЛР":"ПР"}
-    if(r.topic&&!v("topic"))$("topic").value=r.topic;
-    renderSteps();renderQs();save();
-    st.textContent="Імпортовано: мета "+r.goal.length+", кроків "+r.steps.length+" (зображень "+r.imgs+"), питань "+r.qs.length+(r.math?". Формул не перенесено: "+r.math+" (додайте їх вручну)":"")+". Перевірте кожну вкладку.";
+    if(r.topic)$("topic").value=r.topic;
+    if(r.goal.length)$("goal").value=r.goal.join("\n");
+    if(r.equip.length)$("equip").value=r.equip.join("\n");
+    save();
+    const got=[r.topic?"тема":"",r.goal.length?"мета ("+r.goal.length+")":"",r.equip.length?"обладнання":""].filter(Boolean);
+    st.textContent=got.length?"Імпортовано: "+got.join(", ")+". Перевірте поля; решту заповніть самостійно.":"Не знайшов тему, мету чи обладнання у файлі.";
   }catch(e){st.textContent="Не вдалося прочитати файл: "+e.message}
 };
 
