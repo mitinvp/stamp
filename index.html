@@ -194,6 +194,8 @@ function buildDoc(d){
     out.push(Pg({spacing:{before:0,after:0,line:120,lineRule:D.LineRuleType.EXACT}}));
     return out;
   };
+  const codeBlock=t=>String(t).replace(/\r/g,"").replace(/\t/g,"    ").split("\n").map(l=>Pg({alignment:A.LEFT,spacing:{before:0,after:0,line:240},keepLines:true,
+    shading:{type:D.ShadingType.CLEAR,fill:"F2F2F2",color:"auto"},children:[new D.TextRun({text:l,font:"Courier New",size:22})]}));
   d.steps.forEach((s,i)=>{
     let first=true;
     s.blocks.forEach(b=>{
@@ -207,6 +209,7 @@ function buildDoc(d){
       if(b.t==="img")ch.push(...imgs(b.imgs));
       else if(b.t==="formula"){if(b.text.trim())ch.push(Pg({alignment:A.CENTER,spacing:{before:80,after:80},children:[new D.Math({children:parseMath(b.text)})]}));}
       else if(b.t==="table")ch.push(...tableBlock(b));
+      else if(b.t==="code"){if(b.text.trim())ch.push(...codeBlock(b.text));}
     });
     if(!s.blocks.length)ch.push(P((i+1)+"."));
   });
@@ -251,11 +254,12 @@ async function finalize(raw,d,type){
   let doc=await Z.file("word/document.xml").async("string");
   const rels=await Z.file("word/_rels/document.xml.rels").async("string");
   const relTags=[...rels.matchAll(/<Relationship\b[^>]*>/g)].map(m=>m[0]);
+  let nid=100;const uniq=x=>x.replace(/<wp:docPr id="\d+"/g,()=>'<wp:docPr id="'+(nid++)+'"');
   for(const m of doc.matchAll(/<w:headerReference\b[^>]*>/g)){
     const ty=/w:type="(\w+)"/.exec(m[0])[1],id=/r:id="([^"]+)"/.exec(m[0])[1];
     const tag=relTags.find(r=>r.includes('Id="'+id+'"'));
     const target=/Target="([^"]+)"/.exec(tag)[1].replace(/^\//,"").replace(/^word\//,"");
-    if(ty==="default")Z.file("word/"+target,fillStamp(STAMPS.small,d));
+    if(ty==="default")Z.file("word/"+target,uniq(fillStamp(STAMPS.small,d)));
   }
   let st=await Z.file("word/styles.xml").async("string");
   Z.file("word/styles.xml",st.replace("</w:styles>",STAMP_STYLE+BODY_STYLE+"</w:styles>"));
@@ -264,7 +268,7 @@ async function finalize(raw,d,type){
   const bx=fillStamp(STAMPS.big,d);
   const bigAC=bx.slice(bx.indexOf("<mc:AlternateContent"),bx.indexOf("</mc:AlternateContent>")+22);
   if(r)doc=doc.slice(0,r.index)+'<w:r><w:rPr><w:noProof/></w:rPr>'+bigAC+'</w:r>'+BLOCKER+doc.slice(r.index);
-  Z.file("word/document.xml",doc);
+  Z.file("word/document.xml",uniq(doc));
   return Z.generateAsync({type:type||"blob",mimeType:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
 }
 </script>
@@ -309,7 +313,7 @@ try{const t=localStorage.getItem("zvit-theme");if(t)document.documentElement.dat
 setIcon();
 
 /* --- блоки кроків --- */
-const PH={text:"Текст кроку",formula:"Формула: (a)/(b)   x^2   x_1   sqrt(x)",table:"Таблиця: вставте з Excel/Word або вводьте рядки, комірки через Tab або ;"};
+const PH={text:"Текст кроку",code:"Вставте код програми",formula:"Формула: (a)/(b)   x^2   x_1   sqrt(x)",table:"Таблиця: вставте з Excel/Word або вводьте рядки, комірки через Tab або ;"};
 const SN=[["(a)/(b)","дріб"],["x^2","x²"],["x_1","xₙ"],["sqrt(x)","√"],["<=","≤"],[">=","≥"],["!=","≠"],["pi","π"],["*","·"]];
 function addFiles(b,list){[...list].filter(f=>f.type.startsWith("image/")).forEach(f=>b.files.push(f));renderSteps();save()}
 function renderSteps(){
@@ -333,8 +337,9 @@ function renderSteps(){
         bk.append(el("small",{textContent:"Скріншоти"}),dz,el("div",{className:"row"},[el("button",{type:"button",className:"sm",textContent:"Вибрати файли",onclick:()=>fi.click()})]),fi,th);
       }else{
         const ta=el("textarea",{value:b.text||"",placeholder:PH[b.t],className:b.t==="text"?"":"m"});
+        if(b.t==="code"){ta.wrap="off";ta.style.whiteSpace="pre";ta.style.minHeight="120px";ta.spellcheck=false}
         ta.oninput=()=>{b.text=ta.value;save()};
-        bk.append(el("small",{textContent:{text:"Текст",formula:"Формула",table:"Таблиця"}[b.t]}));
+        bk.append(el("small",{textContent:{text:"Текст",code:"Код (моноширинний шрифт)",formula:"Формула",table:"Таблиця"}[b.t]}));
         if(b.t==="formula"){
           const r=el("div",{className:"row",style:"margin:0 0 6px"});
           SN.forEach(([v,l])=>r.append(el("button",{type:"button",className:"sm",textContent:l,onclick:()=>{
@@ -351,7 +356,7 @@ function renderSteps(){
       card.append(bk);
     });
     const add=el("div",{className:"row"});
-    [["text","+ Текст"],["img","+ Скріншот"],["formula","+ Формула"],["table","+ Таблиця"]].forEach(([t,l])=>
+    [["text","+ Текст"],["code","+ Код"],["img","+ Скріншот"],["formula","+ Формула"],["table","+ Таблиця"]].forEach(([t,l])=>
       add.append(el("button",{type:"button",className:"sm",textContent:l,onclick:()=>{s.blocks.push({t,text:"",files:[]});renderSteps();save()}})));
     add.append(el("button",{type:"button",className:"sm",textContent:"Видалити крок",onclick:()=>{S.steps.splice(i,1);if(!S.steps.length)S.steps.push(NS());renderSteps();save()}}));
     card.append(add);box.append(card);
