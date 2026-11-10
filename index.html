@@ -66,6 +66,21 @@ button:disabled{opacity:.5}
 .ck{padding:0}
 .ck .e{color:var(--err)}.ck .w{color:var(--warn)}.ck .o{color:var(--ok)}
 #st{margin-top:10px;font-size:1rem;min-height:1.3em}
+.bar{margin-bottom:6px}
+.bi{display:flex;gap:8px;align-items:center}
+.bi select{flex:1;min-width:0}
+.pr{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:.85rem;color:var(--mut)}
+.pt{flex:1;height:8px;background:var(--acl);border-radius:6px;overflow:hidden}
+.pt i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--ac),var(--ac2));transition:width .3s}
+#sv{min-width:9.5em;text-align:right}
+nav button.bad i{background:var(--warn);color:#fff}
+.sh{display:flex;align-items:center;gap:8px}
+.sh .pv2{color:var(--mut);font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.hint{color:var(--mut);font-size:.92rem;margin:0 0 10px}
+details.hint summary{cursor:pointer;color:var(--ac)}
+.hint code{background:var(--acl);padding:1px 5px;border-radius:5px;color:var(--fg)}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 14px;border-radius:12px;display:flex;gap:12px;align-items:center;z-index:20;box-shadow:0 4px 18px rgba(0,0,0,.3);max-width:92vw}
+#toast button{background:var(--ac);color:var(--acf);border:0}
 @media (max-width:520px){.g{grid-template-columns:1fr}}
 </style>
 </head>
@@ -78,37 +93,45 @@ button:disabled{opacity:.5}
 </div></header>
 <nav><div id="tabs"></div></nav>
 <main>
+<div class="bar">
+<div class="bi"><select id="dsel" aria-label="Мої роботи"></select><button type="button" class="sm" id="newW">＋ Нова</button><button type="button" class="sm" id="delW">Видалити</button></div>
+<div class="pr"><div class="pt"><i id="pbar"></i></div><span id="ptxt">0%</span><span id="sv"></span></div>
+</div>
 <section data-s="0">
-<div class="row" style="margin:0 0 4px"><button type="button" id="newW" class="sm">↺ Нова робота</button></div>
 <h2>Штамп</h2>
 <div class="g">
 <div><label>Тип роботи</label><select id="kind"><option>ПР</option><option>ЛР</option></select></div>
-<div><label>Номер (напр. 21.04)</label><input id="num"></div>
+<div><label>Номер (напр. 21.04)</label><input id="num" placeholder="напр. 21.04"></div>
 <div><label>Група</label><input id="group" placeholder="КІ 23"></div>
-<div><label>Розробив (Прізвище І.П.)</label><input id="student"></div>
+<div><label>Розробив (Прізвище І.П.)</label><input id="student" placeholder="Іваненко І.І."></div>
 <div class="f"><label>Перевірив (Прізвище І.П.)</label><input id="checker"></div>
-<div class="f"><label>Тема роботи (потрапляє в штамп, до ~200 символів)</label><textarea id="topic" rows="3"></textarea></div>
+<div class="f"><label>Тема роботи (потрапляє в штамп, до ~200 символів)</label><textarea id="topic" rows="3" placeholder="Тема з методички, напр. Умовні оператори в Python"></textarea></div>
 </div>
 </section>
 <section data-s="1" hidden>
 <h2>Мета роботи та обладнання</h2>
+<p class="hint">Мета: чого ви навчитеся в цій роботі, кожен пункт з нового рядка. Обладнання: що використовували (комп’ютер, програма).</p>
 <label>Мета: кожен пункт з нового рядка</label>
-<textarea id="goal" rows="5"></textarea>
+<textarea id="goal" rows="5" placeholder="навчитися …&#10;навчитися …"></textarea>
 <label>Обладнання</label>
-<textarea id="equip" rows="2">Набір програмного забезпечення.</textarea>
+<textarea id="equip" rows="2" placeholder="напр. Набір програмного забезпечення."></textarea>
 </section>
 <section data-s="2" hidden>
 <h2>Порядок виконання роботи</h2>
+<p class="hint">Опишіть, що ви зробили, і додайте скріншот результату. Для коду є блок «+ Код», для таблиць «+ Таблиця».</p>
+<details class="hint"><summary>Довідка по формулах</summary><p>Дріб: <code>(a+b)/c</code> · степінь: <code>x^2</code> · індекс: <code>x_1</code> · корінь: <code>sqrt(x+1)</code> · знаки: <code>&lt;=</code> <code>&gt;=</code> <code>!=</code> · система умов: кнопка «система {», рядки розділяйте <code>;</code></p></details>
 <div id="steps"></div>
-<button type="button" id="addStep">+ Крок</button>
+<div class="row"><button type="button" id="addStep">+ Крок</button><button type="button" id="colAll" class="sm">Згорнути всі</button></div>
 </section>
 <section data-s="3" hidden>
 <h2>Контрольні питання</h2>
+<p class="hint">Запишіть питання з методички (можна залишити порожнім) і свою відповідь.</p>
 <div id="qs"></div>
 <button type="button" id="addQ">+ Питання</button>
 </section>
 <section data-s="4" hidden>
 <h2>Висновок</h2>
+<p class="hint">Коротко: що ви зробили й чого навчилися. Наприклад: «В ході виконання роботи я навчився…».</p>
 <textarea id="concl" rows="6" placeholder="В ході виконання роботи я навчився…"></textarea>
 </section>
 <section data-s="5" hidden>
@@ -122,6 +145,7 @@ button:disabled{opacity:.5}
 </section>
 <div class="nv"><button type="button" id="back">← Назад</button><span id="pos"></span><button type="button" class="p" id="next">Далі →</button></div>
 </main>
+<div id="toast" hidden></div>
 
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -300,16 +324,85 @@ const NS=()=>({blocks:[{t:"text",text:"",files:[]}]});
 const S={steps:[NS()],qs:[{q:"",a:""}]};
 let tab=0,tm;
 
-/* --- чернетка (IndexedDB: текст + скріншоти) --- */
+/* --- чернетки: кілька робіт у IndexedDB (текст + скріншоти) --- */
 const idb=()=>new Promise((ok,no)=>{const r=indexedDB.open("zvit",1);r.onupgradeneeded=()=>r.result.createObjectStore("k");r.onsuccess=()=>ok(r.result);r.onerror=no});
-async function idbGet(){try{const db=await idb();return await new Promise(r=>{const q=db.transaction("k").objectStore("k").get("draft2");q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)})}catch(e){return null}}
-function save(){clearTimeout(tm);tm=setTimeout(async()=>{try{const f={};FIELDS.forEach(k=>f[k]=$(k).value);const db=await idb();db.transaction("k","readwrite").objectStore("k").put({f,steps:S.steps,qs:S.qs,tab},"draft2")}catch(e){}},500)}
+const dbx=async(mode,fn)=>{const db=await idb();return new Promise((ok,no)=>{const tx=db.transaction("k",mode),r=fn(tx.objectStore("k"));tx.oncomplete=()=>ok(r&&r.result);tx.onerror=tx.onabort=()=>no(tx.error)})};
+let cur=null,DL=[],maxTab=0;
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const snapDraft=()=>{const f={};FIELDS.forEach(k=>f[k]=$(k).value);return{f,steps:S.steps,qs:S.qs,tab,updated:Date.now()}};
+const titleOf=d=>{const f=d.f||{},c=((f.kind||"")+" "+(f.num||"")).trim(),t=(f.topic||"").trim().slice(0,28);return c.length>3||t?[c.length>3?c:"",t].filter(Boolean).join(" · "):"Нова робота"};
+const saveIdx=()=>dbx("readwrite",st=>st.put(DL,"idx"));
+function setSv(t,bad){$("sv").textContent=t;$("sv").style.color=bad?"var(--err)":"var(--mut)"}
+function save(){setSv("Збереження…");updProg();clearTimeout(tm);tm=setTimeout(persist,500)}
+async function persist(){
+  if(!cur)return;
+  try{
+    const d=snapDraft(),title=titleOf(d);
+    await dbx("readwrite",st=>{st.put({...d,id:cur,title},"d:"+cur);return st.put({current:cur},"meta")});
+    let e=DL.find(x=>x.id===cur);if(!e){e={id:cur};DL.push(e)}e.title=title;e.updated=d.updated;
+    await saveIdx();refreshList();
+    setSv("Збережено ✓ "+new Date().toLocaleTimeString("uk",{hour:"2-digit",minute:"2-digit"}));
+  }catch(e){setSv("Не вдалося зберегти в браузері",true)}
+}
+function refreshList(){const s=$("dsel");s.innerHTML="";DL.forEach(x=>s.append(el("option",{value:x.id,textContent:x.title||"Нова робота"})));s.value=cur}
+function applyDraft(d){
+  FIELDS.forEach(k=>$(k).value=(d&&d.f&&d.f[k])||"");if(!$("kind").value)$("kind").value="ПР";
+  S.steps=d&&d.steps&&d.steps.length?d.steps.map(s=>({col:!!s.col,blocks:(s.blocks&&s.blocks.length?s.blocks:[{t:"text",text:""}]).map(b=>({files:[],...b}))})):[NS()];
+  S.qs=d&&d.qs&&d.qs.length?d.qs:[{q:"",a:""}];
+  tab=(d&&d.tab)||0;maxTab=tab;renderSteps();renderQs();show(tab);
+}
+async function loadDraft(id){
+  const d=await dbx("readonly",st=>st.get("d:"+id)).catch(()=>null);
+  cur=id;applyDraft(d);refreshList();
+}
+async function newDraft(){
+  const kind=$("kind").value,student=$("student").value;
+  cur=uid();FIELDS.forEach(k=>$(k).value="");$("kind").value=kind;$("student").value=student;
+  S.steps=[NS()];S.qs=[{q:"",a:""}];maxTab=0;renderSteps();renderQs();show(0);
+  DL.unshift({id:cur,title:"Нова робота",updated:Date.now()});refreshList();await persist();
+}
+$("newW").onclick=async()=>{clearTimeout(tm);await persist();await newDraft();toast("Створено нову роботу: група, «Перевірив», тема й решта порожні")};
+$("dsel").onchange=async()=>{const id=$("dsel").value;clearTimeout(tm);await persist();await loadDraft(id)};
+$("delW").onclick=async()=>{
+  const old=cur,rec=snapDraft(),oe={id:old,title:titleOf(rec),updated:Date.now()};
+  clearTimeout(tm);DL=DL.filter(x=>x.id!==old);
+  try{await dbx("readwrite",st=>st.delete("d:"+old))}catch(e){}
+  if(DL.length)await loadDraft(DL[0].id);else await newDraft();
+  await saveIdx().catch(()=>{});
+  toast("Роботу «"+oe.title+"» видалено",async()=>{
+    try{await dbx("readwrite",st=>st.put({...rec,id:old,title:oe.title},"d:"+old))}catch(e){}
+    DL.unshift(oe);await saveIdx().catch(()=>{});await loadDraft(old);
+  });
+};
+
+/* --- скасування дій + підказка-тост --- */
+let utm;
+function toast(msg,undo){
+  const t=$("toast");t.innerHTML="";t.append(el("span",{textContent:msg}));
+  if(undo)t.append(el("button",{type:"button",className:"sm",textContent:"Скасувати",onclick:()=>{t.hidden=true;undo()}}));
+  t.hidden=false;clearTimeout(utm);utm=setTimeout(()=>t.hidden=true,9000);
+}
+const snap=()=>({f:FIELDS.map(k=>$(k).value),steps:S.steps.map(s=>({col:s.col,blocks:s.blocks.map(b=>({...b,files:[...(b.files||[])]}))})),qs:S.qs.map(x=>({...x}))});
+function restore(o){FIELDS.forEach((k,i)=>$(k).value=o.f[i]);S.steps=o.steps;S.qs=o.qs;renderSteps();renderQs();save()}
+function undoable(msg,fn){const o=snap();fn();renderSteps();renderQs();save();toast(msg,()=>restore(o))}
+
+/* --- прогрес і стан вкладок --- */
+const OK=[()=>["num","group","student","topic"].every(f=>v(f)),()=>!!v("goal"),()=>S.steps.some(s=>s.blocks.some(b=>b.t==="text"&&b.text.trim())),()=>S.qs.some(x=>x.a.trim())&&!S.qs.some(x=>x.q.trim()&&!x.a.trim()),()=>!!v("concl")];
+function paintTabs(){[...$("tabs").children].forEach((b,i)=>{
+  const seen=i<5&&i<=maxTab&&i!==tab,ok=i<5&&OK[i]();
+  b.className=(i===tab?"on ":"")+(seen?(ok?"done":"bad"):"");b.firstChild.textContent=seen?(ok?"✓":"!"):i+1;
+  if(i===tab&&b.scrollIntoView)b.scrollIntoView({inline:"center",block:"nearest"})})}
+function updProg(){
+  const it=[v("num"),v("group"),v("student"),v("topic"),v("goal"),OK[2](),S.qs.some(x=>x.a.trim()),v("concl")];
+  const p=Math.round(it.filter(Boolean).length/it.length*100);
+  $("pbar").style.width=p+"%";$("ptxt").textContent=p+"%";paintTabs();
+}
 
 /* --- вкладки --- */
 function show(n){
-  tab=Math.max(0,Math.min(TABS.length-1,n));
+  tab=Math.max(0,Math.min(TABS.length-1,n));maxTab=Math.max(maxTab,tab);
   document.querySelectorAll("section").forEach(s=>s.hidden=+s.dataset.s!==tab);
-  [...$("tabs").children].forEach((b,i)=>{b.className=(i===tab?"on ":"")+(i<tab?"done":"");b.firstChild.textContent=i<tab?"✓":i+1;if(i===tab)b.scrollIntoView({inline:"center",block:"nearest"})});
+  paintTabs();
   $("back").style.visibility=tab?"visible":"hidden";
   $("next").style.visibility=tab<TABS.length-1?"visible":"hidden";
   $("pos").textContent=(tab+1)+" / "+TABS.length;
@@ -341,13 +434,20 @@ function addFiles(b,list){[...list].filter(f=>f.type.startsWith("image/")).forEa
 function renderSteps(){
   const box=$("steps");box.innerHTML="";
   S.steps.forEach((s,i)=>{
-    const card=el("div",{className:"card"},[el("b",{textContent:"Крок "+(i+1)})]);
+    const card=el("div",{className:"card"});
+    const prev=((s.blocks.find(b=>b.t==="text"&&b.text.trim())||{text:""}).text.trim().split("\n")[0]).slice(0,80);
+    const nimg=s.blocks.reduce((n,b)=>n+(b.t==="img"?b.files.length:0),0);
+    card.append(el("div",{className:"sh"},[
+      el("button",{type:"button",className:"sm",textContent:s.col?"▸":"▾",title:s.col?"Розгорнути":"Згорнути",onclick:()=>{s.col=!s.col;renderSteps();save()}}),
+      el("b",{textContent:"Крок "+(i+1)}),
+      el("span",{className:"pv2",textContent:s.col?(prev||"(порожньо)")+(nimg?" · 🖼 "+nimg:""):""})]));
+    if(s.col){box.append(card);return}
     s.blocks.forEach((b,bi)=>{
       const mv=d=>{const j=bi+d;if(j<0||j>=s.blocks.length)return;[s.blocks[bi],s.blocks[j]]=[s.blocks[j],s.blocks[bi]];renderSteps();save()};
       const bk=el("div",{className:"bk"},[el("div",{className:"ctl"},[
         el("button",{type:"button",className:"sm",textContent:"↑",onclick:()=>mv(-1)}),
         el("button",{type:"button",className:"sm",textContent:"↓",onclick:()=>mv(1)}),
-        el("button",{type:"button",className:"sm",textContent:"✕",onclick:()=>{s.blocks.splice(bi,1);renderSteps();save()}})])]);
+        el("button",{type:"button",className:"sm",textContent:"✕",onclick:()=>undoable("Блок видалено",()=>s.blocks.splice(bi,1))})])]);
       if(b.t==="img"){
         const fi=el("input",{type:"file",accept:"image/*",multiple:true,hidden:true});
         fi.onchange=()=>addFiles(b,fi.files);
@@ -355,7 +455,7 @@ function renderSteps(){
         dz.onpaste=e=>{e.preventDefault();addFiles(b,e.clipboardData.files)};
         dz.ondragover=e=>e.preventDefault();dz.ondrop=e=>{e.preventDefault();addFiles(b,e.dataTransfer.files)};
         const th=el("div",{className:"th"});
-        b.files.forEach((f,j)=>{const x=el("b",{textContent:"×"});x.onclick=()=>{b.files.splice(j,1);renderSteps();save()};th.append(el("span",{},[el("img",{src:URL.createObjectURL(f)}),x]))});
+        b.files.forEach((f,j)=>{const x=el("b",{textContent:"×"});x.onclick=()=>undoable("Скріншот видалено",()=>b.files.splice(j,1));th.append(el("span",{},[el("img",{src:URL.createObjectURL(f)}),x]))});
         const cap=el("input",{type:"text",value:b.caption||"",placeholder:"Підпис: «Рисунок N – …» (необов’язково)",style:"margin-top:8px"});cap.oninput=()=>{b.caption=cap.value;save()};
         bk.append(el("small",{textContent:"Скріншоти"}),dz,el("div",{className:"row"},[el("button",{type:"button",className:"sm",textContent:"Вибрати файли",onclick:()=>fi.click()})]),fi,th,cap);
       }else{
@@ -381,18 +481,20 @@ function renderSteps(){
     const add=el("div",{className:"row"});
     [["text","+ Текст"],["code","+ Код"],["img","+ Скріншот"],["formula","+ Формула"],["table","+ Таблиця"]].forEach(([t,l])=>
       add.append(el("button",{type:"button",className:"sm",textContent:l,onclick:()=>{s.blocks.push({t,text:"",files:[]});renderSteps();save()}})));
-    add.append(el("button",{type:"button",className:"sm",textContent:"Видалити крок",onclick:()=>{S.steps.splice(i,1);if(!S.steps.length)S.steps.push(NS());renderSteps();save()}}));
+    add.append(el("button",{type:"button",className:"sm",textContent:"Видалити крок",onclick:()=>undoable("Крок "+(i+1)+" видалено",()=>{S.steps.splice(i,1);if(!S.steps.length)S.steps.push(NS())})}));
     card.append(add);box.append(card);
   });
+  $("colAll").textContent=S.steps.some(s=>!s.col)?"Згорнути всі":"Розгорнути всі";
 }
 function renderQs(){
   const box=$("qs");box.innerHTML="";
   S.qs.forEach((x,i)=>{
     const q=el("input",{type:"text",value:x.q,placeholder:"Питання "+(i+1)});q.oninput=()=>{x.q=q.value;save()};
     const a=el("textarea",{value:x.a,placeholder:"Відповідь"});a.oninput=()=>{x.a=a.value;save()};
-    box.append(el("div",{className:"card"},[q,el("div",{style:"height:6px"}),a,el("div",{className:"row"},[el("button",{type:"button",className:"sm",textContent:"Видалити",onclick:()=>{S.qs.splice(i,1);if(!S.qs.length)S.qs.push({q:"",a:""});renderQs();save()}})])]));
+    box.append(el("div",{className:"card"},[q,el("div",{style:"height:6px"}),a,el("div",{className:"row"},[el("button",{type:"button",className:"sm",textContent:"Видалити",onclick:()=>undoable("Питання "+(i+1)+" видалено",()=>{S.qs.splice(i,1);if(!S.qs.length)S.qs.push({q:"",a:""})})})])]));
   });
 }
+$("colAll").onclick=()=>{const c=S.steps.some(s=>!s.col);S.steps.forEach(s=>s.col=c);renderSteps();save()};
 $("addStep").onclick=()=>{S.steps.push(NS());renderSteps();save()};
 $("addQ").onclick=()=>{S.qs.push({q:"",a:""});renderQs();save()};
 FIELDS.forEach(f=>$(f).addEventListener("input",save));
@@ -449,24 +551,21 @@ $("go").onclick=async()=>{
   $("go").disabled=false;
 };
 
-/* --- нова робота --- */
-$("newW").onclick=()=>{
-  if(!confirm("Почати нову роботу? Усі поля, крім типу роботи й вашого прізвища, будуть очищені (номер, група, «Перевірив», тема, мета, обладнання, кроки, питання, висновок)."))return;
-  ["num","group","checker","topic","goal","equip","concl"].forEach(k=>$(k).value="");
-  S.steps=[NS()];S.qs=[{q:"",a:""}];renderSteps();renderQs();show(0);save();
-};
-
-/* --- старт: чернетка, потім параметри з посилання (?type=ПР&num=21.04&group=КІ 23&tpl=0) --- */
+/* --- старт: чернетки, потім параметри з посилання (?type=ПР&num=21.04&group=КІ 23) --- */
 (async()=>{
-  const d=await idbGet();
-  if(d){
-    FIELDS.forEach(k=>{if(d.f&&d.f[k]!=null)$(k).value=d.f[k]});
-    if(d.steps&&d.steps.length)S.steps=d.steps.map(s=>({blocks:(s.blocks||[]).map(b=>({files:[],...b}))}));
-    if(d.qs&&d.qs.length)S.qs=d.qs;tab=d.tab||0;
-  }
+  try{
+    DL=(await dbx("readonly",st=>st.get("idx")))||[];
+    if(!DL.length){
+      const old=await dbx("readonly",st=>st.get("draft2")).catch(()=>null);
+      if(old){const id=uid();await dbx("readwrite",st=>st.put({...old,id},"d:"+id));DL=[{id,title:titleOf(old),updated:Date.now()}]}
+    }
+    const meta=await dbx("readonly",st=>st.get("meta")).catch(()=>null);
+    const id=meta&&DL.find(x=>x.id===meta.current)?meta.current:(DL[0]&&DL[0].id);
+    if(id)await loadDraft(id);else{cur=uid();DL=[{id:cur,title:"Нова робота",updated:Date.now()}];applyDraft(null);refreshList()}
+  }catch(e){cur=cur||uid();applyDraft(null);setSv("Чернетки не зберігаються (приватний режим?)",true)}
   const q=new URLSearchParams(location.search);
   [["type","kind"],["num","num"],["group","group"],["student","student"],["checker","checker"],["topic","topic"]].forEach(([p,f])=>{if(q.get(p))$(f).value=q.get(p)});
-  renderSteps();renderQs();show(tab);
+  updProg();save();
 })();
 </script>
 </body>
