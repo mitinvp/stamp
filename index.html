@@ -547,6 +547,7 @@ $("go").onclick=async()=>{
     const name=(d.kind+"_"+d.num+"_"+d.student).replace(/[^\p{L}\p{N}._-]+/gu,"_")+".docx";
     const a=el("a",{href:URL.createObjectURL(blob),download:name});document.body.append(a);a.click();a.remove();
     st.textContent="Готово: "+name;
+    try{window.goatcounter&&window.goatcounter.count&&window.goatcounter.count({path:"download-docx",title:"Завантажено .docx",event:true})}catch(e){}
   }catch(err){st.textContent="Помилка: "+err.message}
   $("go").disabled=false;
 };
@@ -568,5 +569,6 @@ $("go").onclick=async()=>{
   updProg();save();
 })();
 </script>
+<script data-goatcounter="https://ribery85.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
